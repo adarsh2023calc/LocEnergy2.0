@@ -30,5 +30,6 @@ async def predict_solar_energy(lat: float = Query(...), lng: float = Query(...))
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         data = response.json()
-       
+        print("Hello World")
+
     return data
