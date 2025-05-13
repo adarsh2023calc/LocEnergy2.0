@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Energy Prediction Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #6a1b9a;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #c8e6c9;
+      padding: 15px 30px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #e1f5fe, #f3e5f5);
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: #6a1b9a;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+
+    .hero button {
+      background-color: #c8e6c9;
+      color: #6a1b9a;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #map {
+      height: 400px;
+      width: 100%;
+      position: relative;
+      padding:10px;
+    }
+
+    #search-input {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      width: 300px;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    canvas {
+      max-width: 600px;
+      margin: 20px auto;
+      display: block;
+    }
+
+    footer {
+      background-color: #f1f8e9;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #6a1b9a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    Energy Mapper
+  </div>
+
+  <section class="hero">
+    <h1>Discover Solar Potential</h1>
+    <p>Click anywhere on the map or search a location to predict solar energy generation using Google's Solar API.</p>
+    <button onclick="document.getElementById('map').scrollIntoView({ behavior: 'smooth' })">
+      Try It Now
+    </button>
+  </section>
+
+  <div id="map">
+    <input onload="initMap" id="search-input" type="text" placeholder="Search location...">
+  </div>
+
+  <canvas id="energyChart"></canvas>
+
+  <footer>
+    © 2025 Energy Mapper | Powered by Google Solar API
+  </footer>
+
+  <script>
+  
+  </script>
+  <script>
+    let map, chart;
+
+     const loadGoogleMaps = (callback) => {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_SOLAR_API_KEY}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    script.onload = callback;
+    document.head.appendChild(script);
+  };
+
+    loadGoogleMaps(initMap); // Call it to actually load Maps
+
+    function initMap() {
+      
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 20.5937, lng: 78.9629 },
+        zoom: 5
+      });
+
+      const input = document.getElementById("search-input");
+      const searchBox = new google.maps.places.SearchBox(input);
+      map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+
+      map.addListener("bounds_changed", () => {
+        searchBox.setBounds(map.getBounds());
+      });
+
+      let marker = null;
+
+      searchBox.addListener("places_changed", () => {
+        const places = searchBox.getPlaces();
+        if (places.length === 0) return;
+
+        const place = places[0];
+        const location = place.geometry.location;
+
+        if (marker) marker.setMap(null);
+        marker = new google.maps.Marker({
+          map,
+          position: location
+        });
+
+        map.panTo(location);
+        map.setZoom(10);
+
+        fetchPrediction(location.lat(), location.lng());
+      });
+
+      map.addListener("click", (e) => {
+        fetchPrediction(e.latLng.lat(), e.latLng.lng());
+      });
+      
+    }
+
+    async function fetchPrediction(lat, lng) {
+      try {
+        
+    const response = await fetch(`http://localhost:8000/predict?lat=${lat}&lng=${lng}`);
+    const result = await response.json();
+
+    if (!result || !result.solarPotential) {
+      alert("No solar data available for this location.");
+      return;
+    }
+
+    drawChart(result);
+  } catch (error) {
+    alert("Error fetching data from backend.");
+    console.error(error);
+  }
+    }
+
+    function drawChart(data) {
+      const ctx = document.getElementById('energyChart').getContext('2d');
+
+      const labels = [
+        "maxArrayPanelsCount",
+        "Panel Efficiency (%)",
+        "Carbon Offset (kg/MWh)",
+        "Panel Lifetime (years)"
+      ];
+
+      const values = [
+        (data.solarPotential.maxArrayPanelsCount / 1000).toFixed(2),
+        (data.panelEfficiency * 100).toFixed(2),
+        data.carbonOffsetFactorKgPerMwh,
+        data.panelLifetimeYears
+      ];
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Solar Potential',
+            data: values,
+            backgroundColor: ['#f9a825', '#1976d2', '#388e3c', '#d32f2f']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    
+  </script>
+
+</body>
+</html>
