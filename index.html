@@ -104,6 +104,14 @@
 
   <canvas id="energyChart"></canvas>
 
+  <div id="dashboard" style="max-width: 800px; margin: 30px auto; padding: 20px; background: #f3e5f5; border-radius: 12px;">
+  <h2 style="text-align:center; color:#6a1b9a;">Solar Site Report</h2>
+  <div id="details" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; margin-top: 20px;">
+    <!-- Data cards will be injected here -->
+  </div>
+</div>
+
+
   <footer>
     © 2025 Energy Mapper | Powered by Google Solar API
   </footer>
@@ -177,7 +185,7 @@
       alert("No solar data available for this location.");
       return;
     }
-
+    updateDashboard(result);
     drawChart(result);
   } catch (error) {
     alert("Error fetching data from backend.");
@@ -226,6 +234,27 @@
         }
       });
     }
+
+    function updateDashboard(data) {
+  const detailsDiv = document.getElementById('details');
+  detailsDiv.innerHTML = '';
+
+  const items = [
+    { label: "Maximum Array Panels Count", value: data.solarPotential.maxArrayPanelsCount },
+    { label: "Maximum Area meters", value: data.solarPotential.maxArrayAreaMeters2 }, 
+    { label: "Maximum Sunshine Hours Per Year", value: data.solarPotential.maxSunshineHoursPerYear},
+    { label: "CO₂ Offset (kg/year)", value: data.solarPotential.carbonOffsetFactorKgPerMwh },
+    
+  ];
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.style.cssText = "flex: 1 1 40%; padding: 15px; background:#fff; border-radius: 8px; box-shadow:0 0 10px rgba(0,0,0,0.05); text-align:center;";
+    card.innerHTML = `<h3 style="color:#6a1b9a">${item.label}</h3><p style="font-size:1.4rem; font-weight:bold">${item.value}</p>`;
+    detailsDiv.appendChild(card);
+  });
+}
+
 
     
   </script>
