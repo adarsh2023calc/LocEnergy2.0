@@ -41,11 +41,11 @@ async def predict_solar_energy(lat: float = Query(...), lng: float = Query(...))
 
 
 
-@app.post("/predict_nasa")
+@app.get("/predict_nasa")
 async def predict_energy_from_Nasa(lat: float = Query(...), lng: float = Query(...)):
     nasa_api=f"https://power.larc.nasa.gov/api/temporal/daily/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude={lat}&latitude={lng}&start=20240101&end=20241231&format=JSON"
     async with httpx.AsyncClient() as client:
-            response = await client.get(url)
+            response = await client.get(nasa_api)
             data = response.json()
 
     return data

@@ -183,41 +183,51 @@
           const response = await fetch(`http://localhost:8000/predict?lat=${lat}&lng=${lng}`);
           const result = await response.json();
 
-          const response2= await fetch(`http://localhost:8000/predict_nasa?lat=${lat}&lng=${lng}`);
+          const response2 = await fetch(`http://localhost:8000/predict_nasa?lat=${lat}&lng=${lng}`);
 
-          const result2 = await respinse.json();
-
+          const result2 = await response2.json();
           if (!result || !result.solarPotential) {
             alert("No solar data available for this location.");
             return;
           }
 
-          if (!result2) {
-            alert("No solar data available for this location.");
-            return;
-          }
+          
 
             
-          updateDashboard(result);
-          updateDashboardWithNasaData(result2)
+          updateDashboard(result,result2);
+          
     
     } catch (error) {
       alert("Error fetching data from backend.");
-      console.error(error);
+      alert(error.stack);
   }
     }
 
 
-    function updateDashboard(data) {
+    function updateDashboard(data,result2) {
       const detailsDiv = document.getElementById('details');
       detailsDiv.innerHTML = '';
+
+      var avgAll;
+      if (!result2.properties.Length > 0){
+            avgAll=0;
+        }
+
+      else{
+          const average_Solar_irradience_map = result2.properties.parameter.ALLSKY_SFC_SW_DWN;
+          const values = Object.values(average_Solar_irradience_map);
+          const validValues = values.filter(v => v !== -999.0);
+          avgAll = validValues.reduce((sum, val) => sum + val, 0) / values.length;
+      }
+
+      alert(avgAll)
 
       const items = [
         { label: "Maximum Array Panels Count", value: data.solarPotential.maxArrayPanelsCount },
         { label: "Maximum Area meters", value: data.solarPotential.maxArrayAreaMeters2 }, 
         { label: "Maximum Sunshine Hours Per Year", value: data.solarPotential.maxSunshineHoursPerYear},
         { label: "CO₂ Offset (kg/year)", value: data.solarPotential.carbonOffsetFactorKgPerMwh },
-        
+        { label:"All Sky Surface Shortwave Downward Irradiance (kW-hr/m^2/day)",value:avgAll}
       ];
 
       items.forEach(item => {
