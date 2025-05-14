@@ -14,7 +14,7 @@ app = FastAPI()
 # CORS setup for frontend interaction
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or restrict to your domain
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -23,13 +23,32 @@ app.add_middleware(
 @app.get("/predict")
 async def predict_solar_energy(lat: float = Query(...), lng: float = Query(...)):
 
-    url = (
-        f"https://solar.googleapis.com/v1/buildingInsights:findClosest"
-        f"?location.latitude={lat}&location.longitude={lng}&requiredQuality=HIGH&key={GOOGLE_API_KEY}"
-    )
+    try:
+        url = (
+            f"https://solar.googleapis.com/v1/buildingInsights:findClosest"
+            f"?location.latitude={lat}&location.longitude={lng}&requiredQuality=HIGH&key={GOOGLE_API_KEY}"
+        )
+
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
+            data = response.json()
+
+        
+        return data
+    except:
+         return httpx.RequestError("Failure! Unable to extract data")
+
+
+
+@app.post("/predict_nasa")
+async def predict_energy_from_Nasa(lat: float = Query(...), lng: float = Query(...)):
+    nasa_api=f"https://power.larc.nasa.gov/api/temporal/daily/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude={lat}&latitude={lng}&start=20240101&end=20241231&format=JSON"
     async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        data = response.json()
-        print("Hello World")
+            response = await client.get(url)
+            data = response.json()
 
     return data
+
+
+
