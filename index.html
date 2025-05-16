@@ -206,28 +206,14 @@
 
     function updateDashboard(data,result2) {
       const detailsDiv = document.getElementById('details');
-      detailsDiv.innerHTML = '';
-
-      var avgAll;
-      if (!result2.properties.Length > 0){
-            avgAll=0;
-        }
-
-      else{
-          const average_Solar_irradience_map = result2.properties.parameter.ALLSKY_SFC_SW_DWN;
-          const values = Object.values(average_Solar_irradience_map);
-          const validValues = values.filter(v => v !== -999.0);
-          avgAll = validValues.reduce((sum, val) => sum + val, 0) / values.length;
-      }
-
-      alert(avgAll)
-
+      detailsDiv.innerHTML ="";
+      
       const items = [
         { label: "Maximum Array Panels Count", value: data.solarPotential.maxArrayPanelsCount },
         { label: "Maximum Area meters", value: data.solarPotential.maxArrayAreaMeters2 }, 
         { label: "Maximum Sunshine Hours Per Year", value: data.solarPotential.maxSunshineHoursPerYear},
         { label: "CO₂ Offset (kg/year)", value: data.solarPotential.carbonOffsetFactorKgPerMwh },
-        { label:"All Sky Surface Shortwave Downward Irradiance (kW-hr/m^2/day)",value:avgAll}
+        { label:"All Sky Surface Shortwave Downward Irradiance (kW-hr/m^2/day)",value:0}
       ];
 
       items.forEach(item => {
