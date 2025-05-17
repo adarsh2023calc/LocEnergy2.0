@@ -209,13 +209,27 @@
 
       
       detailsDiv.innerHTML ="";
+
+      const panels = data?.solarPotential?.solarPanels;
+
+      var yearlyEnergyDcKwh=0;
+      if (!panels || panels.length === 0) {
+        yearlyEnergyDcKwh=0
+        
+      }
+
+      else{
+         const totalEnergy = panels.reduce((sum, panel) => sum + (panel.yearlyEnergyDcKwh || 0), 0);
+         yearlyEnergyDcKwh = totalEnergy / panels.length;
+
+      }
       
       const items = [
         { label: "Maximum Array Panels Count", value: data.solarPotential.maxArrayPanelsCount },
         { label: "Maximum Area meters", value: data.solarPotential.maxArrayAreaMeters2 }, 
         { label: "Maximum Sunshine Hours Per Year", value: data.solarPotential.maxSunshineHoursPerYear},
         { label: "CO₂ Offset (kg/year)", value: data.solarPotential.carbonOffsetFactorKgPerMwh },
-        { label:"All Sky Surface Shortwave Downward Irradiance (kW-hr/m^2/day)",value:0}
+        { label:"Average Energy produced yearly (Kwh)",value:yearlyEnergyDcKwh}
       ];
 
       items.forEach(item => {
