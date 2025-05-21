@@ -41,14 +41,22 @@ async def predict_solar_energy(lat: float = Query(...), lng: float = Query(...))
 
 
 
-@app.get("/predict_nasa")
-async def predict_energy_from_Nasa(lat: float = Query(...), lng: float = Query(...)):
-    nasa_api=f"https://power.larc.nasa.gov/api/temporal/daily/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude={lat}&latitude={lng}&start=20240101&end=20241231&format=JSON"
-    async with httpx.AsyncClient() as client:
-            response = await client.get(nasa_api)
+@app.get("/place_info")
+async def fetch_place_info(lat: float = Query(...), lng: float = Query(...)):
+
+    try:
+        url = (
+            f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+            f"location={lat},{lng}&radius=1000&type=restaurant&key={GOOGLE_API_KEY}"
+        )
+
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
             data = response.json()
 
-    return data
-
-
+        print(data)
+        return data
+    except:
+         return httpx.RequestError("Failure! Unable to extract data")
 
