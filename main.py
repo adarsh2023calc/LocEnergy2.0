@@ -71,7 +71,7 @@ async def get_gemini_suggest(items: str= Query(...)):
     Here is a data:
     {json.dumps(items, indent=2)}
 
-    From the data, gather insights and display them clearly.
+    From the data, gather insights (like estimated cost of production etc.) and display them clearly.
     """
 
     
@@ -95,5 +95,5 @@ async def get_gemini_suggest(items: str= Query(...)):
     result = response.json()
     print(result)
     output = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No output received")
-
+    
     return {"output": output}
