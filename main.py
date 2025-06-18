@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import json
 import requests
 import math
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
 
@@ -22,6 +24,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+def serve_index():
+    return FileResponse("static/index.html")
+
+
+
+
+    
 @app.get("/predict")
 async def predict_solar_energy(lat: float = Query(...), lng: float = Query(...)):
 

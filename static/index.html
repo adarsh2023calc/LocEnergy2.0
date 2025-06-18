@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <title>Energy Prediction Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="config.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <script>
+    const GOOGLE_SOLAR_API_KEY="AIzaSyDJd7BdPrNmNjXNyrGeOvP3T5PAZJQ6izI"
+    loadGoogleMaps(initMap);
+    
+  </script>
   <style>
     body {
       margin: 0;
@@ -208,8 +209,9 @@
     async function fetchPlaceinfo(lat,lng){
 
       try {
-        
-          const response = await fetch(`http://localhost:8000/predict?lat=${lat}&lng=${lng}`);
+           
+          const BASE_URL = "https://locenergy1-28955744236.europe-west1.run.app";
+          const response = await fetch(`${BASE_URL}/predict?lat=${lat}&lng=${lng}`);
           const result = await response.json();
           if (!result || !result.solarPotential) {
             alert("No solar data available for this location.");
@@ -227,8 +229,9 @@
 
     async function fetchPrediction(lat, lng) {
       try {
-          const response = await fetch(`http://localhost:8000/predict?lat=${lat}&lng=${lng}`);
-          const response2 = await fetch(`http://localhost:8000/place_info?lat=${lat}&lng=${lng}`);
+          const BASE_URL = "https://locenergy1-28955744236.europe-west1.run.app";
+          const response = await fetch(`${BASE_URL}/predict?lat=${lat}&lng=${lng}`);
+          const response2 = await fetch(`${BASE_URL}/place_info?lat=${lat}&lng=${lng}`);
           const result = await response.json();
           const result2 = await response2.json();
           if (!result || !result2) {
@@ -248,7 +251,7 @@
 
     async function GetGeminiInsights(items) {
       try {
-        const response = await fetch(`http://localhost:8000/get_gemini_suggest?items=${encodeURIComponent(items)}`);
+        const response = await fetch(`${BASE_URL}/get_gemini_suggest?items=${encodeURIComponent(items)}`);
         const data = await response.json();
 
         const chat = document.getElementById("gemini_details");
