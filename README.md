@@ -74,34 +74,22 @@ Use Gemini AI to generate insights based on solar data and location.
 git clone https://github.com/adarsh2023calc/LocEnergy2.0.git
 cd LocEnergy2.0```
 
-2. **Install dependencies
+**2. 🔐 Create .env File**
+```bash
 
-bash
-Copy
-Edit
 pip install -r requirements.txt
-Create .env file
-
-bash
-Copy
-Edit
 GOOGLE_SOLAR_API_KEY=your_google_api_key
-GEMINI_API_KEY=your_gemini_api_key
-Run the app
+GEMINI_API_KEY=your_gemini_api_key```
 
-bash
-Copy
-Edit
-uvicorn main:app --reload
-Open in browser
+3. **Run the app**
 
-cpp
-Copy
-Edit
-http://127.0.0.1:8000
-🐳 Docker Deployment
-bash
-Copy
-Edit
+```bash
+
+uvicorn main:app --reload```
+
+**🐳 Docker Deployment**
+```bash
+
 docker build -t locenergy-app .
-docker run -p 8080:8080 locenergy-app 
+docker run -p 8080:8080 locenergy-app ```
+
