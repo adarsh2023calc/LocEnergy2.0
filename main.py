@@ -80,12 +80,20 @@ async def fetch_place_info(lat: float = Query(...), lng: float = Query(...)):
 @app.get("/get_gemini_suggest")
 
 
-async def get_gemini_suggest(items: str= Query(...)):
+async def get_gemini_suggest(items: str= Query(...),lat: float = Query(...), lng: float = Query(...)):
     prompt = f"""
     Here is a data:
     {json.dumps(items, indent=2)}
 
     From the data, gather insights (like estimated cost of production etc.) and display them clearly.
+
+    Cost of production can be calculated as follows
+
+    Thought1: Verify the country from Latitude:{lat} and Longitude:{lng} 
+    Thought2: Find avg cost of installing one solar panel in the given country
+    Thought3: Total cost: avg cost of installing one solar panel * Maximum Array Panels Count
+    Thought4: Give the final amount in the local currency of that country where it belongs
+
     """
 
     
@@ -107,7 +115,6 @@ async def get_gemini_suggest(items: str= Query(...)):
 
     response = requests.post(url, headers=headers, data=json.dumps(data))
     result = response.json()
-    print(result)
     output = result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No output received")
     
     return {"output": output}

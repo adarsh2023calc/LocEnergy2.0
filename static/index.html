@@ -217,7 +217,7 @@
             alert("No solar data available for this location.");
             return;
           } 
-          updateDashboard(result);
+          updateDashboard(result,lat,lng);
           
     
     } catch (error) {
@@ -238,7 +238,7 @@
             alert("No location data available for this location.");
             return;
           } 
-          updateDashboard(result);    
+          updateDashboard(result,lat,lng);    
           updatePlaceDashBoard(result2);
 
     
@@ -249,7 +249,7 @@
   }
 
 
-    async function GetGeminiInsights(items) {
+    async function GetGeminiInsights(items,lat,long) {
       try {
         const response = await fetch(`${BASE_URL}/get_gemini_suggest?items=${encodeURIComponent(items)}`);
         const data = await response.json();
@@ -269,7 +269,7 @@
 
 
 
-    function updateDashboard(data) {
+    function updateDashboard(data,lat,long) {
       const detailsDiv = document.getElementById('details');
 
       
@@ -308,7 +308,7 @@
 
 
     
-      GetGeminiInsights(StringData);
+      GetGeminiInsights(StringData,lat,long);
       
 
 
